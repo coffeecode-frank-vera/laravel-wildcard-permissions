@@ -1,0 +1,48 @@
+{
+    "name": "coffeecode/laravel-wildcard-permissions",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "coffeecode",
+        "laravel",
+        "permission",
+        "permissions",
+        "roles",
+        "role",
+        "users",
+        "wildcard",
+        "gate",
+        "security"
+    ],
+    "authors": [
+        {
+            "name": "Frank Vera",
+            "email": "frank.vera@coffeecode.com.mx"
+        }
+    ],
+    "homepage": "https://github.com/coffeecode-frank-vera/laravel-wildcard-permissions",
+    "require": {
+        "php": "^8.0",
+        "illuminate/auth": "^8.12|^9.0|^10.0|^11.0",
+        "illuminate/container": "^8.12|^9.0|^10.0|^11.0",
+        "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0",
+        "illuminate/database": "^8.12|^9.0|^10.0|^11.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "CoffeeCode\\WildcardPermission\\": "src"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CoffeeCode\\WildcardPermission\\WildcardPermissionServiceProvider"
+            ]
+        }
+    }
+}
