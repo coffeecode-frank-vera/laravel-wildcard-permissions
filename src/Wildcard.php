@@ -9,18 +9,18 @@ class Wildcard {
     public $OR = 'or';
     public $ALL = 'all';
     public $NAMESPACE = 'namespace';
-    protected $OPERATORS = [];
-
-    protected $EXACT_REGEX = '/^[a-z][a-zA-Z:]*[a-z]$/';
-    protected $OR_REGEX = '/^[a-z][a-zA-Z:|]*[a-z]$/';
-    protected $AND_REGEX = '/^[a-z][a-zA-Z:,]*[a-z]$/';
-    protected $ALL_REGEX = '/^[a-z][a-zA-Z:]*[a-z]|[:*]$/';
-    protected $value;
 
     public $operation;
     public $namespaces;
     public $lookups;
     public $valid = false;
+
+    protected $OPERATORS = [];
+    protected $EXACT_REGEX = '/^[a-z][a-zA-Z:]*[a-z]$/';
+    protected $OR_REGEX = '/^[a-z][a-zA-Z:|]*[a-z]$/';
+    protected $AND_REGEX = '/^[a-z][a-zA-Z:,]*[a-z]$/';
+    protected $ALL_REGEX = '/^[a-z][a-zA-Z:]*[a-z]|[:*]$/';
+    protected $value;
 
     public function __construct($value)
     {
@@ -46,6 +46,11 @@ class Wildcard {
         $this->valid = $this->isExact() || $this->isWildcard();
     }
 
+    /**
+     * Get the value of the wildcard\
+     *
+     * @return string
+     */
     public function getValue() {
         if ($this->isExact()) {
             return str_replace($this->OPERATORS[$this->ALL]['value'], '', $this->value);
@@ -120,6 +125,11 @@ class Wildcard {
         return true;
     }
 
+    /**
+     * Get the possibilities of the wildcard\
+     *
+     * @return Collection
+     */
     public function getPossibilities(): Collection {
         if ($this->isExact()) {
             return collect([$this->value]);
