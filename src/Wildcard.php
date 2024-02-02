@@ -1,7 +1,9 @@
 <?php
 
 namespace CoffeeCode\WildcardPermission;
+
 use Illuminate\Support\Collection;
+
 class Wildcard {
     public $AND = 'and';
     public $OR = 'or';

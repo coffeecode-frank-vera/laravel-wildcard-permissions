@@ -2,9 +2,9 @@
 
 namespace CoffeeCode\WildcardPermission;
 
+use CoffeeCode\WildcardPermission\WildcardPermissionRegistrar;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\ServiceProvider;
-use CoffeeCode\WildcardPermission\WildcardPermissionRegistrar;
 
 class WilcardPermissionsServiceProvider extends ServiceProvider {
     public function boot() {

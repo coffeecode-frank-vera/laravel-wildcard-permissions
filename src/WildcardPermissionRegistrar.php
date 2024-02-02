@@ -2,12 +2,17 @@
 
 namespace CoffeeCode\WildcardPermission;
 
-use Illuminate\Contracts\Auth\Access\Authorizable;
-use Illuminate\Contracts\Auth\Access\Gate;
-use CoffeeCode\WildcardPermission\Contracts\WildcardPermission;
-use CoffeeCode\WildcardPermission\Contracts\Role;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Config;
+
+use CoffeeCode\WildcardPermission\Contracts\{
+    Role,
+    WildcardPermission
+};
+use Illuminate\Contracts\Auth\Access\{
+    Authorizable,
+    Gate
+};
 
 class WildcardPermissionRegistrar {
 

@@ -2,10 +2,13 @@
 
 namespace CoffeeCode\WildcardPermission\Traits;
 
-use CoffeeCode\WildcardPermission\Contracts\Role;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use CoffeeCode\WildcardPermission\WildcardPermissionRegistrar;
 use Illuminate\Support\Facades\Config;
+
+use CoffeeCode\WildcardPermission\{
+    Contracts\Role,
+    WildcardPermissionRegistrar
+};
 
 trait HasRoles {
     use HasPermissions;
