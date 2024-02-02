@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use CoffeeCode\WildcardPermission\Contracts\WildcardPermission;
 use CoffeeCode\WildcardPermission\Contracts\Role;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Config;
 
 class WildcardPermissionRegistrar {
 
@@ -22,18 +23,17 @@ class WildcardPermissionRegistrar {
 
     public function __construct()
     {
-        $this->permissionClass = config('permission.models.permission');
-        $this->roleClass = config('permission.models.role');
+        $this->permissionClass = Config::get('permission.models.permission');
+        $this->roleClass = Config::get('permission.models.role');
+        $this->pivotRole = Config::get('permission.column_names.role_pivot_key') ?: 'role_id';
+        $this->pivotPermission = Config::get('permission.column_names.permission_pivot_key') ?: 'permission_id';
     }
 
     public function registerPermissions(Gate $gate): bool
     {
         $gate->before(function (Authorizable $user, string $ability, array &$args = []) {
-            if (is_string($args[0] ?? null) && ! class_exists($args[0])) {
-                $guard = array_shift($args);
-            }
             if (method_exists($user, 'checkPermissionTo')) {
-                return $user->checkPermissionTo($ability, $guard ?? null) ?: null;
+                return $user->checkPermissionTo($ability) ?: null;
             }
         });
 
@@ -48,7 +48,7 @@ class WildcardPermissionRegistrar {
     public function setPermissionClass($permissionClass)
     {
         $this->permissionClass = $permissionClass;
-        config()->set('permission.models.permission', $permissionClass);
+        Config::set('permission.models.permission', $permissionClass);
         app()->bind(WildcardPermission::class, $permissionClass);
 
         return $this;
@@ -62,7 +62,7 @@ class WildcardPermissionRegistrar {
     public function setRoleClass($roleClass)
     {
         $this->roleClass = $roleClass;
-        config()->set('permission.models.role', $roleClass);
+        Config::set('permission.models.role', $roleClass);
         app()->bind(Role::class, $roleClass);
 
         return $this;

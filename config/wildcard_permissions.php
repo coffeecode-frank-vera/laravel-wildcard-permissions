@@ -1,7 +1,10 @@
 <?php
 
 return [
-    'models' => [],
+    'models' => [
+        'permission' => CoffeeCode\WildcardPermission\Models\WildcardPermission::class,
+        'role' => CoffeeCode\WildcardPermission\Models\Role::class
+    ],
     'table_names' => [
         'roles' => 'roles',
         'wildcard_permissions' => 'wildcard_permissions',
@@ -11,7 +14,7 @@ return [
     ],
     'pivot_names' => [
         'role_pivot_key' => 'role_id',
-        'permission_pivot_key' => 'wildcardpermission_id',
+        'permission_pivot_key' => 'permission_id',
         'model_id' => 'model_id'
     ]
 ];

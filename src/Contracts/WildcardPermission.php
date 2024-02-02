@@ -21,7 +21,7 @@ interface WildcardPermission {
      * ex: WilcardPermission::findByShortName('Admin edit Permission');
      *
      * @param string $shortName
-     * @throws PermissionNotFoundException
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\PermissionNotFoundException
      * @return self
      */
     public static function findByShortName(string $shortName): self;
@@ -31,7 +31,7 @@ interface WildcardPermission {
      * ex: WilcardPermission::findByGuardName('admin:create');
      *
      * @param string $guardName
-     * @throws PermissionNotFoundException
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\PermissionNotFoundException
      * @return self
      */
     public static function findByGuardName(string $guardName): self;
@@ -40,7 +40,7 @@ interface WildcardPermission {
      * Find permission by its id
      *
      * @param integer $id
-     * @throws PermissionNotFoundException
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\PermissionNotFoundException
      * @return self
      */
     public static function findById(int $id): self;

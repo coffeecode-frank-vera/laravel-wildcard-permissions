@@ -2,7 +2,7 @@
 
 namespace CoffeeCode\WildcardPermission\Contracts;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Contract for Wildcard Permission Model
@@ -21,17 +21,27 @@ interface Role {
      * ex: WilcardPermission::findByShortName('Admin edit Permission');
      *
      * @param string $shortName
-     * @throws RoleNotFoundException
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\RoleNotFoundException
      * @return self
      */
     public static function findByShortName(string $shortName): self;
+
+    /**
+     * Find role by it's guard name
+     * ex: WilcardPermission::findByGuardName('admin:create');
+     *
+     * @param string $guardName
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\RoleNotFoundException
+     * @return self
+     */
+    public static function findByGuardName(string $guardName): self;
 
 
     /**
      * Find permission by its id
      *
      * @param integer $id
-     * @throws RoleNotFoundException
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\RoleNotFoundException
      * @return self
      */
     public static function findById(int $id): self;
@@ -42,9 +52,9 @@ interface Role {
      * ex: $role->hasPermissionTo("admin:create,read");
      * ex: $role->hasPermissionTo("admin:*");
      *
-     * @param string $wildcard
-     * @throws WildcardNotValidException
+     * @param string $permission
+     * @throws \CoffeeCode\WildcardPermission\Exceptions\WildcardNotValidException
      * @return boolean
      */
-    public function hasPermissionTo(string $wildcard): bool;
+    public function hasPermissionTo(string $permission): bool;
 }
