@@ -17,13 +17,9 @@ use Illuminate\Contracts\Auth\Access\{
 class WildcardPermissionRegistrar {
 
     protected string $permissionClass;
-
     protected string $roleClass;
-
     protected $permissions;
-
     public string $pivotRole;
-
     public string $pivotPermission;
 
     public function __construct()
@@ -34,6 +30,12 @@ class WildcardPermissionRegistrar {
         $this->pivotPermission = Config::get('permission.column_names.permission_pivot_key') ?: 'permission_id';
     }
 
+    /**
+     * Register the permissions
+     * 
+     * @param Gate $gate
+     * @return bool
+     */
     public function registerPermissions(Gate $gate): bool
     {
         $gate->before(function (Authorizable $user, string $ability, array &$args = []) {
@@ -45,11 +47,17 @@ class WildcardPermissionRegistrar {
         return true;
     }
 
+    /**
+     * Get the permission class
+     */
     public function getPermissionClass(): string
     {
         return $this->permissionClass;
     }
 
+    /**
+     * Set the permission class
+     */
     public function setPermissionClass($permissionClass)
     {
         $this->permissionClass = $permissionClass;
@@ -64,6 +72,9 @@ class WildcardPermissionRegistrar {
         return $this->roleClass;
     }
 
+    /**
+     * Set the role class
+     */
     public function setRoleClass($roleClass)
     {
         $this->roleClass = $roleClass;
@@ -73,6 +84,11 @@ class WildcardPermissionRegistrar {
         return $this;
     }
 
+    /**
+     * Get the permissions with roles
+     *
+     * @return Collection
+     */
     protected function getPermissionsWithRoles(): Collection
     {
         return $this->permissionClass::select()->with('roles')->get();
