@@ -1,6 +1,6 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Contracts;
+namespace CoffeeCode\WildcardPermissions\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -14,14 +14,14 @@ interface Role {
      *
      * @return BelongsToMany
      */
-    public function wildcardPermissions(): HasMany;
+    public function permissions(): BelongsToMany;
 
     /**
      * Find role by it's short name
      * ex: WilcardPermission::findByShortName('Admin edit Permission');
      *
      * @param string $shortName
-     * @throws \CoffeeCode\WildcardPermission\Exceptions\RoleNotFoundException
+     * @throws \CoffeeCode\WildcardPermissions\Exceptions\RoleNotFoundException
      * @return self
      */
     public static function findByShortName(string $shortName): self;
@@ -31,7 +31,7 @@ interface Role {
      * ex: WilcardPermission::findByGuardName('admin:create');
      *
      * @param string $guardName
-     * @throws \CoffeeCode\WildcardPermission\Exceptions\RoleNotFoundException
+     * @throws \CoffeeCode\WildcardPermissions\Exceptions\RoleNotFoundException
      * @return self
      */
     public static function findByGuardName(string $guardName): self;
@@ -41,7 +41,7 @@ interface Role {
      * Find permission by its id
      *
      * @param integer $id
-     * @throws \CoffeeCode\WildcardPermission\Exceptions\RoleNotFoundException
+     * @throws \CoffeeCode\WildcardPermissions\Exceptions\RoleNotFoundException
      * @return self
      */
     public static function findById(int $id): self;
@@ -52,9 +52,9 @@ interface Role {
      * ex: $role->hasPermissionTo("admin:create,read");
      * ex: $role->hasPermissionTo("admin:*");
      *
-     * @param string $permission
-     * @throws \CoffeeCode\WildcardPermission\Exceptions\WildcardNotValidException
-     * @return boolean
+     * @param mixed $permission
+     * @throws \CoffeeCode\WildcardPermissions\Exceptions\WildcardNotValidException
+     * @return bool
      */
-    public function hasPermissionTo(string $permission): bool;
+    public function hasPermissionTo($permission): bool;
 }

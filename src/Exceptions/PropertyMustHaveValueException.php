@@ -1,6 +1,6 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Exceptions;
+namespace CoffeeCode\WildcardPermissions\Exceptions;
 
 use Illuminate\Support\Collection;
 use InvalidArgumentException;

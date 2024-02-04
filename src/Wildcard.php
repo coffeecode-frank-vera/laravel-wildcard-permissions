@@ -1,6 +1,6 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission;
+namespace CoffeeCode\WildcardPermissions;
 
 use Illuminate\Support\Collection;
 
@@ -52,7 +52,7 @@ class Wildcard {
      * @return string
      */
     public function getValue() {
-        if ($this->isExact()) {
+        if ($this->operation === $this->ALL) {
             return str_replace($this->OPERATORS[$this->ALL]['value'], '', $this->value);
         }
 

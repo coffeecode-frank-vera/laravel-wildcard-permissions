@@ -1,13 +1,14 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Traits;
+namespace CoffeeCode\WildcardPermissions\Traits;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Config;
 
-use CoffeeCode\WildcardPermission\{
+use CoffeeCode\WildcardPermissions\{
     Contracts\Role,
-    WildcardPermissionRegistrar
+    Contracts\WildcardPermission,
+    WildcardPermissionsRegistrar
 };
 
 trait HasRoles {
@@ -19,6 +20,21 @@ trait HasRoles {
      * @var Role
      */
     protected $roleClass;
+
+    public static function bootHasRoles()
+    {
+        static::deleting(function ($model) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+                return;
+            }
+
+            $model->roles()->detach();
+            if (is_a($model, WildcardPermission::class)) {
+                $model->users()->detach();
+            }
+        });
+    }
+
     /**
      * Return Roles assigned to model
      *
@@ -26,11 +42,11 @@ trait HasRoles {
      */
     public function roles(): BelongsToMany {
         $relation = $this->morphToMany(
-            Config::get('permission.models.role'),
+            Config::get('wildcard-permissions.models.role'),
             'model',
-            Config::get('permission.table_names.model_has_roles'),
-            Config::get('permission.column_names.model_id'),
-            app(WildcardPermissionRegistrar::class)->pivotRole
+            Config::get('wildcard-permissions.table_names.model_has_roles'),
+            Config::get('wildcard-permissions.column_names.model_id'),
+            app(WildcardPermissionsRegistrar::class)->pivotRole
         );
 
         return $relation;
@@ -44,7 +60,7 @@ trait HasRoles {
     public function getRoleClass(): Role
     {
         if (! $this->roleClass) {
-            $this->roleClass = app(WildcardPermissionRegistrar::class)->getRoleClass();
+            $this->roleClass = app(WildcardPermissionsRegistrar::class)->getRoleClass();
         }
 
         return $this->roleClass;
@@ -96,13 +112,58 @@ trait HasRoles {
      */
     protected function getStoredRole($role): Role {
         if (is_string($role)) {
-            return app(WildcardPermissionRegistrar::class)->getRoleClass()::findByGuardName($role);
+            return app(WildcardPermissionsRegistrar::class)->getRoleClass()::findByGuardName($role);
         }
 
         if (is_int($role)) {
-            return app(WildcardPermissionRegistrar::class)->getRoleClass()::findById($role);
+            return app(WildcardPermissionsRegistrar::class)->getRoleClass()::findById($role);
         }
 
         return $role;
     }
+
+    /**
+     * Determine if the model has the given role
+     *
+     * @param string|Role ...$role
+     * @return bool
+     */
+    public function hasRole($role): bool {
+        if (is_string($role)) {
+            return $this->roles->contains('guard_name', $role);
+        }
+
+        if (is_int($role)) {
+            return $this->roles->contains('id', $role);
+        }
+
+        return $this->roles->contains($role);
+    }
+
+    /**
+     * Determine if the model has any of the given roles
+     *
+     * @param string|Role ...$roles
+     * @return bool
+     */
+    public function hasAnyRole(...$roles) {
+
+        return collect($roles)
+            ->map(fn ($role) => $this->hasRole($role))
+            ->reduce(fn ($carry, $item) => $carry || $item, false);
+    }
+
+    /**
+     * Determine if the model has all of the given roles
+     *
+     * @param string|Role ...$roles
+     * @return bool
+     */
+    public function hasAllRoles(...$roles) {
+
+        return collect($roles)
+            ->map(fn ($role) => $this->hasRole($role))
+            ->reduce(fn ($carry, $item) => $carry && $item, true);
+    }
+
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission;
+namespace CoffeeCode\WildcardPermissions;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Config;
 
-use CoffeeCode\WildcardPermission\Contracts\{
+use CoffeeCode\WildcardPermissions\Contracts\{
     Role,
     WildcardPermission
 };
@@ -14,7 +14,7 @@ use Illuminate\Contracts\Auth\Access\{
     Gate
 };
 
-class WildcardPermissionRegistrar {
+class WildcardPermissionsRegistrar {
 
     protected string $permissionClass;
     protected string $roleClass;
@@ -24,10 +24,10 @@ class WildcardPermissionRegistrar {
 
     public function __construct()
     {
-        $this->permissionClass = Config::get('permission.models.permission');
-        $this->roleClass = Config::get('permission.models.role');
-        $this->pivotRole = Config::get('permission.column_names.role_pivot_key') ?: 'role_id';
-        $this->pivotPermission = Config::get('permission.column_names.permission_pivot_key') ?: 'permission_id';
+        $this->permissionClass = Config::get('wildcard-permissions.models.permission');
+        $this->roleClass = Config::get('wildcard-permissions.models.role');
+        $this->pivotRole = Config::get('wildcard-permissions.column_names.role_pivot_key') ?: 'role_id';
+        $this->pivotPermission = Config::get('wildcard-permissions.column_names.permission_pivot_key') ?: 'permission_id';
     }
 
     /**

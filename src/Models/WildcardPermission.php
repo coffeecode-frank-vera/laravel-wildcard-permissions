@@ -1,20 +1,20 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Models;
+namespace CoffeeCode\WildcardPermissions\Models;
 
 use Illuminate\Support\Facades\{
     Config,
     Log
 };
 
-use CoffeeCode\WildcardPermission\{
+use CoffeeCode\WildcardPermissions\{
     Contracts\WildcardPermission as WilcardPermissionContract,
     Exceptions\PermissionAlreadyExistsException,
     Exceptions\PermissionNotFoundException,
     Exceptions\PropertyMustHaveValueException,
     Exceptions\WildcardNotValidException,
     Wildcard,
-    WildcardPermissionRegistrar
+    WildcardPermissionsRegistrar
 };
 use Illuminate\Database\Eloquent\{
     Relations\BelongsToMany,
@@ -33,19 +33,19 @@ class WildcardPermission extends Model implements WilcardPermissionContract
         $this->setTable(Config::get('wildcard-permission.table_names.permissions'));
     }
 
-    public function create(array $attrs): self
+    public static function create(array $attrs): self
     {
-        if (empty($attrs['shortName']) || empty($attrs['guardName'])) {
-            throw PropertyMustHaveValueException::create(collect(['shortName', 'guardName']));
+        if (empty($attrs['short_name']) || empty($attrs['guard_name'])) {
+            throw PropertyMustHaveValueException::create(collect(['short_name', 'guard_name']));
         }
 
-        $wildcard = new Wildcard($attrs['guardName']);
+        $wildcard = new Wildcard($attrs['guard_name']);
         if (! $wildcard->isExact()) {
-            throw WildcardNotValidException::create($attrs['guardName']);
+            throw WildcardNotValidException::create($attrs['guard_name']);
         }
 
         if (static::checkIfExists($attrs)) {
-            throw PermissionAlreadyExistsException::create($attrs['shortName']);
+            throw PermissionAlreadyExistsException::create($attrs['short_name']);
         }
 
         return static::query()->create($attrs);
@@ -61,8 +61,8 @@ class WildcardPermission extends Model implements WilcardPermissionContract
         return $this->belongsToMany(
             Config::get('wildcard-permission.models.role'),
             Config::get('wildcard-permission.table_names.role_has_permissions'),
-            app(WildcardPermissionRegistrar::class)->pivotPermission,
-            app(WildcardPermissionRegistrar::class)->pivotRole
+            app(WildcardPermissionsRegistrar::class)->pivotPermission,
+            app(WildcardPermissionsRegistrar::class)->pivotRole
         );
     }
 
@@ -71,7 +71,7 @@ class WildcardPermission extends Model implements WilcardPermissionContract
             $this->getModelForGuard($this->attributes['guard_name'] ?? Config::get('auth.defaults.guard')),
             'model',
             Config::get('wildcard-permission.table_names.user_has_permissions'),
-            app(WildcardPermissionRegistrar::class)->pivotPermission,
+            app(WildcardPermissionsRegistrar::class)->pivotPermission,
             Config::get('wildcard-permission.column_names.model_id')
         );
     }
@@ -112,7 +112,7 @@ class WildcardPermission extends Model implements WilcardPermissionContract
     public static function checkIfExists($attrs): bool
     {
         try {
-            static::findByShortName($attrs['shortName']);
+            static::findByShortName($attrs['short_name']);
 
             return true;
         } catch (PermissionNotFoundException $exception) {
@@ -120,7 +120,7 @@ class WildcardPermission extends Model implements WilcardPermissionContract
         }
 
         try {
-            static::findByGuardName($attrs['guardName']);
+            static::findByGuardName($attrs['guard_name']);
 
             return true;
         } catch (PermissionNotFoundException $exception) {

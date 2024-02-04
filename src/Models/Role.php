@@ -1,20 +1,21 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Models;
+namespace CoffeeCode\WildcardPermissions\Models;
 
 use Illuminate\Support\Facades\{
     Config,
     Log
 };
 
-use CoffeeCode\WildcardPermission\{
+use CoffeeCode\WildcardPermissions\{
     Contracts\Role as RoleContract,
     Exceptions\PropertyMustHaveValueException,
-    Exceptions\RoleAlreadyExists,
+    Exceptions\RoleAlreadyExistsException,
     Exceptions\RoleNotFoundException,
     Exceptions\WildcardNotValidException,
+    Traits\HasPermissions,
     Wildcard,
-    WildcardPermissionRegistrar
+    WildcardPermissionsRegistrar
 };
 use Illuminate\Database\Eloquent\{
     Relations\BelongsToMany,
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\{
 
 class Role extends Model implements RoleContract
 {
+    use HasPermissions;
 
     protected $guarded = [];
 
@@ -34,7 +36,7 @@ class Role extends Model implements RoleContract
         parent::__construct($attrs);
 
         $this->guarded[] = $this->primaryKey;
-        $this->setTable(Config::get('permission.table_names.roles'));
+        $this->setTable(Config::get('wildcard-permissions.table_names.roles'));
     }
 
     /**
@@ -46,12 +48,12 @@ class Role extends Model implements RoleContract
      */
     public static function create(array $attrs = [])
     {
-        if (empty($attrs['shortName']) || empty($attrs['guardName'])) {
-            throw PropertyMustHaveValueException::create(collect(['shortName', 'guardName']));
+        if (empty($attrs['short_name']) || empty($attrs['guard_name'])) {
+            throw PropertyMustHaveValueException::create(collect(['short_name', 'guard_name']));
         }
 
         if (static::checkIfExists($attrs)) {
-            throw RoleAlreadyExists::create($attrs['shortName']);
+            throw RoleAlreadyExistsException::create($attrs['short_name']);
         }
 
         return static::query()->create($attrs);
@@ -62,13 +64,13 @@ class Role extends Model implements RoleContract
      *
      * @return BelongsToMany
      */
-    public function wildcardPermissions(): BelongsToMany
+    public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(
-            Config::get('permission.models.permission'),
-            Config::get('permission.table_names.role_has_permissions'),
-            app(WildcardPermissionRegistrar::class)->pivotRole,
-            app(WildcardPermissionRegistrar::class)->pivotPermission
+            Config::get('wildcard-permissions.models.permission'),
+            Config::get('wildcard-permissions.table_names.roles_has_permissions'),
+            app(WildcardPermissionsRegistrar::class)->pivotRole,
+            app(WildcardPermissionsRegistrar::class)->pivotPermission
         );
     }
 
@@ -82,10 +84,10 @@ class Role extends Model implements RoleContract
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(
-            Config::get('permission.models.user'),
-            Config::get('permission.table_names.user_has_roles'),
-            app(WildcardPermissionRegistrar::class)->pivotRole,
-            Config::get('permission.column_names.user_id'),
+            Config::get('wildcard-permissions.models.user'),
+            Config::get('wildcard-permissions.table_names.user_has_roles'),
+            app(WildcardPermissionsRegistrar::class)->pivotRole,
+            Config::get('wildcard-permissions.column_names.user_id'),
         );
     }
 
@@ -100,7 +102,7 @@ class Role extends Model implements RoleContract
     public static function findByShortName(string $shortName): self
     {
 
-        return static::findByProperty('shortName', $shortName);
+        return static::findByProperty('short_name', $shortName);
     }
 
 
@@ -133,7 +135,7 @@ class Role extends Model implements RoleContract
     public static function findByGuardName(string $guardName): self
     {
 
-        return static::findByProperty('guardName', $guardName);
+        return static::findByProperty('guard_name', $guardName);
     }
 
     /**
@@ -142,19 +144,17 @@ class Role extends Model implements RoleContract
      * ex: $role->hasPermissionTo("admin:create,read");
      * ex: $role->hasPermissionTo("admin:*");
      *
-     * @param string $permission
+     * @param mixed $permission
      * @throws WildcardNotValidException
-     * @return boolean
+     * @return bool
      */
-    public function hasPermissionTo(string $permission): bool
+    public function hasPermissionTo($permission): bool
     {
-        $wildcard = new Wildcard($permission);
-
-        if (!$wildcard->valid) {
-            throw WildcardNotValidException::create($permission);
+        if (is_a($permission, WildcardPermission::class)) {
+            return $this->permissions->contains($permission);
         }
 
-        return false;
+        return $this->checkPermissionsTo($this->permissions, $permission);
     }
 
     /**
@@ -166,7 +166,7 @@ class Role extends Model implements RoleContract
     public static function checkIfExists($attrs): bool
     {
         try {
-            static::findByShortName($attrs['shortName']);
+            static::findByShortName($attrs['short_name']);
 
             return true;
         } catch (RoleNotFoundException $exception) {
@@ -174,7 +174,7 @@ class Role extends Model implements RoleContract
         }
 
         try {
-            static::findByGuardName($attrs['guardName']);
+            static::findByGuardName($attrs['guard_name']);
 
             return true;
         } catch (RoleNotFoundException $exception) {

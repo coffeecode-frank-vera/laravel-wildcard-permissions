@@ -2,12 +2,12 @@
 
 return [
     'models' => [
-        'permission' => CoffeeCode\WildcardPermission\Models\WildcardPermission::class,
-        'role' => CoffeeCode\WildcardPermission\Models\Role::class
+        'permission' => CoffeeCode\WildcardPermissions\Models\WildcardPermission::class,
+        'role' => CoffeeCode\WildcardPermissions\Models\Role::class
     ],
     'table_names' => [
         'roles' => 'roles',
-        'wildcard_permissions' => 'wildcard_permissions',
+        'permissions' => 'wildcard_permissions',
         'model_has_permissions' => 'model_has_permissions',
         'model_has_roles' => 'model_has_roles',
         'roles_has_permissions' => 'roles_has_permissions',

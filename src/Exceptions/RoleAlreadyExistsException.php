@@ -1,10 +1,10 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Exceptions;
+namespace CoffeeCode\WildcardPermissions\Exceptions;
 
 use InvalidArgumentException;
 
-class RoleAlreadyExists extends InvalidArgumentException {
+class RoleAlreadyExistsException extends InvalidArgumentException {
     public static function create(string $shortName) {
         return new static("Role \"`{$shortName}`\" already exists.");
     }

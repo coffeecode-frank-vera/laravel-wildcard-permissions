@@ -1,15 +1,15 @@
 <?php
 
-namespace CoffeeCode\WildcardPermission\Traits;
+namespace CoffeeCode\WildcardPermissions\Traits;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-use CoffeeCode\WildcardPermission\{
+use CoffeeCode\WildcardPermissions\{
     Contracts\Role,
     Exceptions\WildcardNotValidException,
     Models\WildcardPermission,
     Wildcard,
-    WildcardPermissionRegistrar
+    WildcardPermissionsRegistrar
 };
 use Illuminate\Support\{
     Facades\Config,
@@ -19,6 +19,22 @@ use Illuminate\Support\{
 
 trait HasPermissions {
 
+    public static function bootHasPermissions()
+    {
+        static::deleting(function ($model) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+                return;
+            }
+
+            if (! is_a($model, WildcardPermission::class)) {
+                $model->permissions()->detach();
+            }
+            if (is_a($model, Role::class)) {
+                $model->users()->detach();
+            }
+        });
+    }
+
     /**
      * A model may have multiple direct permissions.
      * 
@@ -26,11 +42,11 @@ trait HasPermissions {
      */
     public function permissions(): BelongsToMany {
         return $this->morphToMany(
-            Config::get('permission.models.permission'),
+            Config::get('wildcard-permissions.models.permission'),
             'model',
-            Config::get('permission.table_names.model_has_permissions'),
-            Config::get('permission.column_names.model_id'),
-            app(WildcardPermissionRegistrar::class)->pivotPermission
+            Config::get('wildcard-permissions.table_names.model_has_permissions'),
+            Config::get('wildcard-permissions.column_names.model_id'),
+            app(WildcardPermissionsRegistrar::class)->pivotPermission
         );
     }
 
@@ -94,8 +110,13 @@ trait HasPermissions {
      * @throws WildcardNotValidException
      * @return bool
      */
-    protected function checkPermissionsTo($permissions, $wildcard): bool{
-        if (! is_a($wildcard, Wildcard::class)) {
+    public function checkPermissionsTo($permissions, $wildcard): bool {
+
+        if (is_a($wildcard, WildcardPermission::class)) {
+            return $permissions->contains(fn ($permission) => $permission->guard_name === $wildcard->guard_name);
+        }
+
+        if (is_string($wildcard)){
             $wildcard = new Wildcard($wildcard);
         }
 
@@ -103,7 +124,7 @@ trait HasPermissions {
             throw WildcardNotValidException::create($wildcard->getValue());
         }
 
-        $guardNames = $permissions->pluck('guardName')->unique();
+        $guardNames = $permissions->pluck('guard_name')->unique();
 
         if ($wildcard->isExact()) {
             return $guardNames->contains($wildcard->getValue());
@@ -152,8 +173,9 @@ trait HasPermissions {
             return collect();
         }
 
+
         return $this->loadMissing('roles', 'roles.permissions')
-            ->roles->flatMap(fn ($role) => $role->permissions)
+            ->roles->flatMap(fn ($role) => $role->loadMissing('permissions')->permissions)
             ->sort()->values();
     }
 
@@ -166,11 +188,11 @@ trait HasPermissions {
      */
     protected function getStoredPermission($permission) {
         if (is_string($permission)) {
-            return app(WildcardPermissionRegistrar::class)->getPermissionClass()::findByGuardName($permission);
+            return app(WildcardPermissionsRegistrar::class)->getPermissionClass()::findByGuardName($permission);
         }
 
         if (is_int($permission)) {
-            return app(WildcardPermissionRegistrar::class)->getPermissionClass()::findById($permission);
+            return app(WildcardPermissionsRegistrar::class)->getPermissionClass()::findById($permission);
         }
 
         return $permission;
