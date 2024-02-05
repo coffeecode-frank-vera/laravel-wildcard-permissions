@@ -223,3 +223,53 @@ echo $user->hasPermissionTo("modulea:create,read"); // false should have permiss
 echo $user->hasPermissionTo("modulea:create|read"); // true should have permission to read or create in module A
 echo $user->hasPermissionTo("modulea:*"); // true should have any permission for module A
 ```
+
+## Middlewares
+
+This package comes with ``RoleMiddleware``, ``PermissionMiddleware`` and ``RoleOrPermissionMiddleware`` middleware. You can add them inside your app/Http/Kernel.php file to be able to use them through aliases.
+
+```php
+protected $middlewareAliases = [
+    // ...
+    'role' => \CoffeeCode\WildcardPermissions\Middlewares\RoleMiddleware::class,
+    'permission' => \CoffeeCode\WildcardPermissions\Middlewares\PermissionMiddleware::class,
+    'role_or_permission' => \CoffeeCode\WildcardPermissions\Middlewares\RoleOrPermissionMiddleware::class,
+];
+```
+
+## Middleware via Routes
+You can protect your routes using middleware rules:
+
+```php
+Route::group(['middleware' => ['role:reader']], function () {
+    //
+});
+// To add more permissions like an array use the & character
+Route::group(['middleware' => ['permission:module:*&&moduleb:read']], function () {
+    //
+});
+
+Route::group(['middleware' => ['role_or_permission:reader']], function () {
+    //
+});
+```
+
+## Use middleware static methods
+
+For a better usage and to avoid confusion between laravel convetion using colon ``:`` to separate the alias from the parameters and since the guard_names are using the same character for namespaces, alternatively you can use this syntax.
+
+```php
+// You can send a single string
+Route::group(['middleware' => [\CoffeeCode\WildcardPermissions\Middlewares\RoleMiddleware::using('reader')]], function () {
+    //
+});
+// You can send a single string with multiple permissions using &
+Route::group(['middleware' => [\CoffeeCode\WildcardPermissions\Middlewares\PermissionMiddleware::using('module:*&moduleb:read')]], function () {
+    //
+});
+
+// Or better, you can send an array
+Route::group(['middleware' => [\CoffeeCode\WildcardPermissions\Middlewares\RoleOrPermissionMiddleware::using(['manager', 'module:*'])]], function () {
+    //
+});
+```

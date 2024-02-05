@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Version 0.0.2]  - 2024-02-03
+
+### Added
+
+- Add Middlewares
+
+
 ## [Version 0.0.1]  - 2024-02-03
 
 ### Added
@@ -26,3 +33,4 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Nothing
+
