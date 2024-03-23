@@ -96,7 +96,7 @@ trait HasRoles {
     public function unassignRole(...$role): self {
         $roles = collect($role)
             ->flatten()
-            ->map(fn ($role) => $this->getStoredRole($role))
+            ->map(fn ($role) => $this->getStoredRole($role)->id)
             ->all();
 
         $this->roles()->detach($roles);

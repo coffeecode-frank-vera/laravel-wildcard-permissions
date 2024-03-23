@@ -60,7 +60,7 @@ class WildcardPermission extends Model implements WilcardPermissionContract
     {
         return $this->belongsToMany(
             Config::get('wildcard-permission.models.role'),
-            Config::get('wildcard-permission.table_names.role_has_permissions'),
+            Config::get('wildcard-permission.table_names.roles_has_permissions'),
             app(WildcardPermissionsRegistrar::class)->pivotPermission,
             app(WildcardPermissionsRegistrar::class)->pivotRole
         );
