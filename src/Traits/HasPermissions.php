@@ -228,7 +228,7 @@ trait HasPermissions {
     public function revokePermissionsTo(...$permissions) {
         $permissions = collect($permissions)
             ->flatten()
-            ->map(fn ($permission) => $this->getStoredPermission($permission))
+            ->map(fn ($permission) => $this->getStoredPermission($permission)->id)
             ->all();
 
         $this->permissions()->detach($permissions);
