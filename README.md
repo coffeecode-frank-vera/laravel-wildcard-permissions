@@ -15,6 +15,11 @@ A powerful permission management library for Laravel applications.
 - Easy integration with Laravel's authentication system
 - Lightweight and efficient
 
+## Requirements
+
+- PHP 8.1 or higher
+- Laravel 8.12, 9.x, 10.x, 11.x, or 12.x
+
 ## Installation
 
 You can install this package via Composer. Run the following command:
@@ -23,22 +28,9 @@ You can install this package via Composer. Run the following command:
 composer require coffeecodemx/wildcard-permissions
 ```
 
-Then add the service provider in your Laravel project
+The package will be automatically discovered by Laravel (no need to manually register the service provider).
 
-```php
-<?php
-return [
-    ...
-    'providers' => ServiceProvider::defaultProviders()->merge([
-            /*
-            * Package Service Providers...
-            */
-            CoffeeCode\WildcardPermissions\WildcardPermissionsServiceProvider::class,
-    ...
-];
-```
-
-Next you need to publish the configuration and migration files with the following command
+Next, publish the configuration and migration files with the following command
 
 ```bash
 php artisan vendor:publish --provider="CoffeeCode\WildcardPermissions\WildcardPermissionsServiceProvider"

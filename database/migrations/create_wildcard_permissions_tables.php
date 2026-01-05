@@ -9,8 +9,8 @@ return new class extends Migration {
      * Run the migrations
      */
     public function up(): void {
-        $tableNames = Config::get('wildcard-permissions.table_names');
-        $pivotNames = Config::get('wildcard-permissions.pivot_names');
+        $tableNames = config('wildcard-permissions.table_names');
+        $pivotNames = config('wildcard-permissions.pivot_names');
         $pivotRole = $pivotNames['role_pivot_key'];
         $pivotPermission = $pivotNames['permission_pivot_key'];
 
